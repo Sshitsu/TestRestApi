@@ -6,8 +6,11 @@ import mikuTest.TestRestApi.exception.UserNotFoundException;
 import mikuTest.TestRestApi.model.User;
 import mikuTest.TestRestApi.repository.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -20,9 +23,17 @@ public class UserService {
         return userRepo.save(user);
     }
 
+    public List<User> getAllUser() {
+        List<User> users = new ArrayList<>();
+        for(UserEntity entity: userRepo.findAll()){
+            users.add(User.toModel(entity));
+        }
+        return users;
+    }
+
     public User getOne(Long id) throws UserNotFoundException {
-        UserEntity user = userRepo.findById(id).get();
-        if(user == null) throw new UserNotFoundException("User was not found!");
+        UserEntity user = userRepo.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User was not found!"));
         return User.toModel(user);
     }
 
